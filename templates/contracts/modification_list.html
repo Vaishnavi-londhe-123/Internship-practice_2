@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifications - Legal Contract Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header Section with Larger Search Bar -->
+    <div class="row align-items-center mb-4 g-3">
+        <div class="col-lg-6">
+            <h3 class="fw-bold text-dark mb-1">
+                <i class="fa-solid fa-pen-to-square text-warning me-2"></i>Contract Modifications
+            </h3>
+            <h3 class="text-muted small mb-0">View and track all proposed clause changes and modification requests.</h3>
+        </div>
+
+        <!-- Larger Search Bar Form -->
+        <div class="col-lg-6">
+            <form method="GET" action="" class="d-flex justify-content-lg-end">
+                <div class="input-group shadow-sm" style="max-width: 400px; width: 100%;">
+                    <input type="text" name="q" class="form-control form-control-lg fs-6" placeholder="Search modifications or contracts..." value="{{ request.GET.q|default:'' }}">
+                    <button class="btn btn-warning px-4 text-dark fw-semibold" type="submit">
+                        <i class="fa-solid fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modifications Table Card -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-uppercase fs-7">
+                    <tr>
+                        <th class="ps-4">Contract</th>
+                        <th>Clause</th>
+                        <th>Proposed Change</th>
+                        <th>Requested By</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mod in modifications %}
+                    <tr>
+                        <td class="ps-4 fw-semibold text-dark">{{ mod.contract.contract_name|default:"N/A" }}</td>
+                        <td class="text-muted">{{ mod.clause.title|default:"General" }}</td>
+                        <td>{{ mod.proposed_modification|default:"N/A" }}</td>
+                        <td class="text-muted">{{ mod.modified_by.username|default:"N/A" }}</td>
+                        <td>
+                            {% if mod.status == 'Approved' or mod.status == 'APPROVED' %}
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">Approved</span>
+                            {% elif mod.status == 'Rejected' or mod.status == 'REJECTED' %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">Rejected</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark px-2 py-1">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'contract_detail' mod.contract.id %}" class="btn btn-sm btn-outline-primary" title="View Contract">
+                                <i class="fa-solid fa-eye me-1"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <i class="fa-solid fa-file-pen fa-2x text-muted mb-2 opacity-50"></i>
+                            <p class="mb-1 fw-semibold text-secondary">No modification requests found.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

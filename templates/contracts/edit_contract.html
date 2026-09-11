@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Contract - LCMS Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
+        <h2 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-pen-to-square text-warning me-2"></i>Edit Contract</h2>
+        <a href="{% url 'contract_list' %}" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-1"></i> Back to List</a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Contract Name</label>
+                    <input type="text" name="contract_name" class="form-control" value="{{ contract.contract_name }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="DRAFT" {% if contract.status == 'DRAFT' %}selected{% endif %}>Draft</option>
+                        <option value="UNDER_REVIEW" {% if contract.status == 'UNDER_REVIEW' %}selected{% endif %}>Under Review</option>
+                        <option value="APPROVED" {% if contract.status == 'APPROVED' %}selected{% endif %}>Approved</option>
+                        <option value="REJECTED" {% if contract.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Description</label>
+                    <textarea name="description" class="form-control" rows="4">{{ contract.description }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Contract File</label>
+                    <input type="file" name="file" class="form-control">
+                    {% if contract.file %}
+                        <small class="d-block mt-1 text-muted">Current File: <a href="{{ contract.file.url }}" target="_blank">{{ contract.file.name }}</a></small>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-warning fw-bold px-4"><i class="fa-solid fa-floppy-disk me-1"></i> Update Contract</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Contract - LCMS Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow border-0 rounded-4 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold text-dark mb-0"><i class="fa-solid fa-file-circle-plus text-primary me-2"></i>Create New Contract</h4>
+                <a href="{% if request.user.groups.filter.name == 'Approver' or request.user.username|lower == 'approver' %}{% url 'approver_dashboard' %}{% else %}{% url 'manager_dashboard' %}{% endif %}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Back</a>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Contract Name</label>
+                    <input type="text" name="contract_name" class="form-control" placeholder="Enter contract name..." required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Description</label>
+                    <textarea name="description" class="form-control" rows="4" placeholder="Enter contract description..."></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="DRAFT">Draft</option>
+                        <option value="UNDER_REVIEW">Under Review</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REJECTED">Rejected</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Attach Document File</label>
+                    <input type="file" name="file" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm"><i class="fa-solid fa-check me-1"></i> Save Contract</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

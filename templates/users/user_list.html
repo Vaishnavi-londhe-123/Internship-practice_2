@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}User Management - LCMS Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        {% if request.user.is_superuser or request.user.username|lower == 'admin' %}
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse p-3 text-white" style="min-height: 100vh;">
+                <div class="position-sticky">
+                    <h5 class="fw-bold px-3 mb-4 text-warning">LCMS Admin</h5>
+                    <ul class="nav flex-column nav-pills">
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'admin_dashboard' %}" class="nav-link text-white">
+                                <i class="fa-solid fa-chart-line me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'user_list' %}" class="nav-link text-white active">
+                                <i class="fa-solid fa-users me-2"></i> Users
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'user_list' %}" class="nav-link text-white">
+                                <i class="fa-solid fa-user-shield me-2"></i> Roles
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'audit_logs' %}" class="nav-link text-white">
+                                <i class="fa-solid fa-clock-rotate-left me-2"></i> Audit Logs
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <hr class="text-secondary my-4">
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'my_profile' %}" class="nav-link text-white">
+                                <i class="fa-solid fa-user me-2"></i> My Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'logout' %}" class="nav-link text-danger">
+                                <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+        {% else %}
+            <main class="col-12 px-md-4 py-4">
+        {% endif %}
+
+            <!-- Django Messages Alert Section -->
+            {% if messages %}
+                <div class="row">
+                    <div class="col-12">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm rounded-3" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Top Header & Actions -->
+            <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom flex-wrap gap-3">
+                <div>
+                    <h2 class="fw-bold mb-0"><i class="fa-solid fa-users-gear text-danger me-2"></i>User & Role Management</h2>
+                    <p class="text-muted mb-0">Manage system users, credentials, and role assignments securely</p>
+                </div>
+                <div>
+                    {% if request.user.is_superuser or request.user.username|lower == 'admin' %}
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary me-2 rounded-pill px-3"><i class="fa-solid fa-arrow-left me-1"></i> Dashboard</a>
+                    {% else %}
+                        <a href="{% url 'user_dashboard' %}" class="btn btn-outline-secondary me-2 rounded-pill px-3"><i class="fa-solid fa-arrow-left me-1"></i> Dashboard</a>
+                    {% endif %}
+                    
+                    <button class="btn btn-danger rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <i class="fa-solid fa-user-plus me-1"></i> Add New User
+                    </button>
+                </div>
+            </div>
+
+            <!-- Users Table Card -->
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="ps-3 py-3">Username</th>
+                                    <th class="py-3">Full Name</th>
+                                    <th class="py-3">Email</th>
+                                    <th class="py-3">Role</th>
+                                    <th class="py-3">Status</th>
+                                    <th class="text-end pe-3 py-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in users %}
+                                <tr>
+                                    <td class="ps-3 fw-semibold"><i class="fa-solid fa-user-circle me-2 text-secondary"></i>{{ u.username }}</td>
+                                    <td>{{ u.get_full_name|default:"-" }}</td>
+                                    <td>{{ u.email|default:"-" }}</td>
+                                    <td>
+                                        {% if u.is_superuser %}
+                                            <span class="badge bg-danger">Superadmin</span>
+                                        {% elif u.groups.first %}
+                                            <span class="badge bg-primary">{{ u.groups.first.name }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">No Role</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if u.is_active %}
+                                            <span class="badge bg-success-subtle text-success border border-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger-subtle text-danger border border-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        {% if not u.is_superuser %}
+                                            <!-- View Details Button -->
+                                            <a href="{% url 'user_detail' u.id %}" class="btn btn-sm btn-outline-info me-1 rounded-pill px-3" title="View User">
+                                                <i class="fa-solid fa-eye"></i> View
+                                            </a>
+
+                                            <!-- Edit User Button -->
+                                            <a href="{% url 'edit_user' u.id %}" class="btn btn-sm btn-outline-warning me-1 rounded-pill px-3" title="Edit User">
+                                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                                            </a>
+
+                                            <!-- Delete User Form -->
+                                            <form action="{% url 'user_delete' u.id %}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete user {{ u.username }}?')">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Delete User">
+                                                    <i class="fa-solid fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">No users found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- Add User Modal with Password Field -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 shadow">
+            <form action="{% url 'add_user' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold">Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Username</label>
+                        <input type="text" name="username" class="form-control" placeholder="Enter unique username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Full Name</label>
+                        <input type="text" name="full_name" class="form-control" placeholder="Enter first and last name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="user@example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Leave blank for default: defaultpassword123">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Assign Role</label>
+                        <select name="role" class="form-select">
+                            <option value="">-- Select Role --</option>
+                            {% for g in groups %}
+                            <option value="{{ g.id }}">{{ g.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-top bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

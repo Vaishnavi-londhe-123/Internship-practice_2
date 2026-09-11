@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}Approver Dashboard - LCMS Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-2">
+    <!-- Top Bar / Role Header -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <span class="text-muted small text-uppercase fw-semibold">Legal Contract Management System</span>
+                <h4 class="fw-bold text-dark mb-0">Approver Dashboard</h4>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold">
+                    <i class="fa-solid fa-user-shield me-1"></i> Approver
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Message -->
+    <div class="mb-4">
+        <h5 class="fw-bold text-dark">Welcome back, Approver 👋</h5>
+        <p class="text-muted mb-0">Manage, review, and track all legal contracts seamlessly from one dashboard.</p>
+    </div>
+
+    <!-- Quick Stats / Cards Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted d-block small fw-semibold">Total Contracts</span>
+                        <h3 class="fw-bold mb-0 text-dark">{{ total_contracts|default:0 }}</h3>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3 fs-4">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted d-block small fw-semibold">Active Contracts</span>
+                        <h3 class="fw-bold mb-0 text-success">{{ active_contracts|default:0 }}</h3>
+                    </div>
+                    <div class="bg-success bg-opacity-10 text-success p-3 rounded-3 fs-4">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted d-block small fw-semibold">Draft Contracts</span>
+                        <h3 class="fw-bold mb-0 text-warning">{{ draft_contracts|default:0 }}</h3>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3 fs-4">
+                        <i class="fa-solid fa-file-pen"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted d-block small fw-semibold">Pending Approval</span>
+                        <h3 class="fw-bold mb-0 text-danger">{{ pending_approval|default:0 }}</h3>
+                    </div>
+                    <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-3 fs-4">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <a href="{% url 'add_contract' %}" class="card border-0 shadow-sm rounded-4 p-3 bg-white text-decoration-none h-100">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary text-white p-3 rounded-3 me-3 fs-4">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-1">Create Contract</h6>
+                        <p class="text-muted small mb-0">Create a new legal contract.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'contract_list' %}" class="card border-0 shadow-sm rounded-4 p-3 bg-white text-decoration-none h-100">
+                <div class="d-flex align-items-center">
+                    <div class="bg-info text-white p-3 rounded-3 me-3 fs-4">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-1">Manage Contracts</h6>
+                        <p class="text-muted small mb-0">View and manage contracts.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'approval_queue' %}" class="card border-0 shadow-sm rounded-4 p-3 bg-white text-decoration-none h-100">
+                <div class="d-flex align-items-center">
+                    <div class="bg-warning text-white p-3 rounded-3 me-3 fs-4">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-1">Approval Queue</h6>
+                        <p class="text-muted small mb-0">Review pending approvals.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- All Contracts Table Section -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <h5 class="fw-bold mb-1">All Contracts</h5>
+        <p class="text-muted small mb-3">List of all registered legal documents and agreements.</p>
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Contract Title</th>
+                        <th>Client / Vendor</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contract in contracts %}
+                    <tr>
+                        <td class="fw-semibold">{{ contract.contract_name }}</td>
+                        <td>{{ contract.client_name|default:"N/A" }}</td>
+                        <td>
+                            {% if contract.status == 'APPROVED' or contract.status == 'ACTIVE' %}
+                                <span class="badge bg-success bg-opacity-10 text-success px-2 py-1">{{ contract.status }}</span>
+                            {% elif contract.status == 'UNDER_REVIEW' %}
+                                <span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1">{{ contract.status }}</span>
+                            {% elif contract.status == 'REJECTED' %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger px-2 py-1">{{ contract.status }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary px-2 py-1">{{ contract.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ contract.created_at|date:"d M Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">No contracts found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

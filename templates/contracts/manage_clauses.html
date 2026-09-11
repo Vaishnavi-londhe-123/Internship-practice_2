@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Clauses - {{ contract.contract_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h2>Manage Clauses for: {{ contract.contract_name }}</h2>
+        <a href="{% url 'manager_dashboard' %}" class="btn btn-secondary mb-3">Back to Dashboard</a>
+
+        <!-- Add Clause Form -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h4>Add New Clause</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Order Number</label>
+                        <input type="number" name="order_number" class="form-control" value="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Clause Number (e.g., Sec 1.1)</label>
+                        <input type="text" name="clause_number" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Text Content</label>
+                        <textarea name="text_content" class="form-control" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Clause</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Existing Clauses List -->
+        <h4>Existing Clauses</h4>
+        <ul class="list-group">
+            {% for clause in clauses %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ clause.order_number }}. {{ clause.title }}</strong>
+                        <p class="mb-0 text-muted">{{ clause.text_content|truncatechars:100 }}</p>
+                    </div>
+                    <a href="{% url 'delete_clause' clause.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </li>
+            {% empty %}
+                <li class="list-group-item">No clauses added yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

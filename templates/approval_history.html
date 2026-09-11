@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Approval History - Legal Contract Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Back Button & Title Section -->
+    <div class="mb-4">
+        <a href="{% url 'approver_dashboard' %}" class="btn btn-outline-secondary btn-sm mb-3 shadow-sm rounded-3">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+        <h4 class="fw-bold text-dark mb-1">Approval History</h4>
+        <p class="text-muted small mb-0">List of all processed and reviewed contract approvals.</p>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Contract Title</th>
+                        <th>Submitted By</th>
+                        <th>Status</th>
+                        <th>Reviewer Comments / Reason</th>
+                        <th>Reviewed Date</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history_approvals %}
+                    <tr>
+                        <td class="ps-4 fw-semibold text-dark">{{ item.contract.contract_name }}</td>
+                        <td class="text-muted">{{ item.contract.created_by.username|default:"N/A" }}</td>
+                        <td>
+                            {% if item.status == 'Approved' or item.status == 'APPROVED' %}
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">
+                                    {{ item.status }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">
+                                    {{ item.status }}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <!-- Display comments or rejection reasons recorded during processing -->
+                        <td class="text-muted small">
+                            {{ item.comments|default:"No comments provided." }}
+                        </td>
+                        <td class="text-muted small">{{ item.updated_at|date:"d M Y"|default:"N/A" }}</td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'contract_detail' item.contract.id %}" class="btn btn-sm btn-light text-primary border" title="View Contract"><i class="fa-solid fa-eye"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <i class="fa-solid fa-clock-rotate-left fa-2x text-muted mb-2 opacity-50"></i>
+                            <p class="mb-1 fw-semibold text-secondary">No approval history found.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

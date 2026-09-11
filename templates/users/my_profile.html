@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - LCMS Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <div class="text-center mb-4">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold fs-3 mb-3" style="width: 80px; height: 80px;">
+                        {{ request.user.username|slice:":1"|upper }}
+                    </div>
+                    <h3 class="fw-bold text-dark">{{ request.user.username }}</h3>
+                    <p class="text-muted">{{ request.user.email|default:"No email provided" }}</p>
+                </div>
+
+                <hr class="text-secondary my-3">
+
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small fw-semibold">First Name</label>
+                        <p class="fw-medium text-dark fs-6">{{ request.user.first_name|default:"Not specified" }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small fw-semibold">Last Name</label>
+                        <p class="fw-medium text-dark fs-6">{{ request.user.last_name|default:"Not specified" }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small fw-semibold">Username</label>
+                        <p class="fw-medium text-dark fs-6">{{ request.user.username }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small fw-semibold">Role / Status</label>
+                        <p class="fw-medium text-dark fs-6">
+                            {% if request.user.is_superuser %}
+                                <span class="badge bg-danger">Administrator</span>
+                            {% else %}
+                                <span class="badge bg-primary">Standard User</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small fw-semibold">Last Login</label>
+                        <p class="fw-medium text-dark fs-6">{{ request.user.last_login|date:"d M Y, H:i"|default:"Never" }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small fw-semibold">Date Joined</label>
+                        <p class="fw-medium text-dark fs-6">{{ request.user.date_joined|date:"d M Y" }}</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    {% if request.user.is_superuser or request.user.is_staff %}
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary px-4 rounded-pill">Back to Dashboard</a>
+                    {% else %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary px-4 rounded-pill">Back to Dashboard</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
